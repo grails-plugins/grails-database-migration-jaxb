@@ -1,1 +1,5 @@
 The Database Migration JAXB plugin extends the Database Migration plugin to add the ability to write changelogs in Java or Groovy code using JAXB classes.
+
+{warning}
+The plugin uses JAXB 2.2 classes, so you must either use Java 7 or higher, or upgrade to the newer version of JAXB. I don't know if this is possible since the classes are part of the JDK, so your best bet is to use Java 7+.
+{warning}
