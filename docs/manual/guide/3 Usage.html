@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>3 Usage 0.1</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/1%20Introduction%20to%20the%20Database%20Migration%20JAXB%20Plugin.html"><strong>1</strong><span>Introduction to the Database Migration JAXB Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/2%20Getting%20Started.html"><strong>2</strong><span>Getting Started</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../guide/3%20Usage.html"><strong>3</strong><span>Usage</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>Adds support for migrations using JAXB classes</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../guide/2%20Getting%20Started.html">&lt;&lt; <strong>2</strong><span>Getting Started</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+
+
+                <div class="project">
+                    <h1>3 Usage - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Burt Beckwith</p>
+
+                    <p><strong>Version:</strong> 0.1</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h1 id="3 Usage">3 Usage</h1>
+You can still create changelogs in traditional XML Liquibase format, or use Groovy-based scripts, but using this plugin adds an additional option of using JAXB-based scripts. The top-level file must be a Groovy file, e.g. <code>grails-app/migrations/changelog.groovy</code>, but you can include JAXB-based classes with syntax like this:<p class="paragraph"/><div class="code"><pre>include file: 'com.yourcompany.yourapp.SomeClassName.class'</pre></div><p class="paragraph"/>Include the full class name including package. The "file" name must end in ".class" so the correct parser is used.<p class="paragraph"/><h4>Class structure</h4><p class="paragraph"/>Classes can be written in Java or Groovy. They should implement the <code>grails.plugin.databasemigration.jaxb.JaxbChangelogGenerator</code> interface:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">public</span> <span class="java&#45;keyword">interface</span> JaxbChangelogGenerator &#123;
+   List&#60;DatabaseChangeLog&#62; generate();
+&#125;</pre></div><p class="paragraph"/>This isn't required however; your class just needs a no-arg method named <code>generate</code> that returns a List of one or more <code>org.liquibase.xml.ns.dbchangelog.DatabaseChangeLog</code> instances.<p class="paragraph"/>For the most part the API of the JAXB classes should be clear; read the source if not. They were generated from the schema that is used for Liquibase XML files (and therefore the Groovy DSL since it's based on the XML syntax) so the same attributes are supported.<p class="paragraph"/>Here's an example of a class written in Java; this is from the plugin's integration tests:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> grails.plugin.databasemigration.jaxb;<p class="paragraph"/><span class="java&#45;keyword">import</span> java.util.ArrayList;
+<span class="java&#45;keyword">import</span> java.util.Collections;
+<span class="java&#45;keyword">import</span> java.util.List;<p class="paragraph"/><span class="java&#45;keyword">import</span> org.liquibase.xml.ns.dbchangelog.Column;
+<span class="java&#45;keyword">import</span> org.liquibase.xml.ns.dbchangelog.Constraints;
+<span class="java&#45;keyword">import</span> org.liquibase.xml.ns.dbchangelog.CreateTable;
+<span class="java&#45;keyword">import</span> org.liquibase.xml.ns.dbchangelog.DatabaseChangeLog;
+<span class="java&#45;keyword">import</span> org.liquibase.xml.ns.dbchangelog.DatabaseChangeLog.ChangeSet;<p class="paragraph"/><span class="java&#45;keyword">public</span> class CreateDepartmentTable <span class="java&#45;keyword">implements</span> JaxbChangelogGenerator &#123;<p class="paragraph"/>   <span class="java&#45;keyword">public</span> List&#60;DatabaseChangeLog&#62; generate() &#123;<p class="paragraph"/>      ChangeSet changeSet = <span class="java&#45;keyword">new</span> DatabaseChangeLog.ChangeSet();
+      changeSet.setId(<span class="java&#45;quote">"department"</span>);
+      changeSet.setAuthor(<span class="java&#45;quote">"Bob"</span>);<p class="paragraph"/>      CreateTable createTable = <span class="java&#45;keyword">new</span> CreateTable();
+      createTable.setTableName(<span class="java&#45;quote">"department"</span>);<p class="paragraph"/>      Column column = <span class="java&#45;keyword">new</span> Column();
+      column.setName(<span class="java&#45;quote">"id"</span>);
+      column.setType(<span class="java&#45;quote">"<span class="java&#45;object">int</span>"</span>);
+      List&#60;<span class="java&#45;object">Object</span>&#62; columnContent = <span class="java&#45;keyword">new</span> ArrayList&#60;<span class="java&#45;object">Object</span>&#62;();
+      Constraints constraints = <span class="java&#45;keyword">new</span> Constraints();
+      constraints.setPrimaryKey(<span class="java&#45;quote">"<span class="java&#45;keyword">true</span>"</span>);
+      constraints.setNullable(<span class="java&#45;quote">"<span class="java&#45;keyword">false</span>"</span>);
+      columnContent.add(constraints);
+      column.setContent(columnContent);
+      createTable.getColumn().add(column);<p class="paragraph"/>      column = <span class="java&#45;keyword">new</span> Column();
+      column.setName(<span class="java&#45;quote">"name"</span>);
+      column.setType(<span class="java&#45;quote">"varchar(50)"</span>);
+      createTable.getColumn().add(column);<p class="paragraph"/>      column = <span class="java&#45;keyword">new</span> Column();
+      column.setName(<span class="java&#45;quote">"active"</span>);
+      column.setType(<span class="java&#45;quote">"<span class="java&#45;object">boolean</span>"</span>);
+      column.setDefaultValueBoolean(<span class="java&#45;quote">"<span class="java&#45;keyword">true</span>"</span>);
+      columnContent = <span class="java&#45;keyword">new</span> ArrayList&#60;<span class="java&#45;object">Object</span>&#62;();
+      constraints = <span class="java&#45;keyword">new</span> Constraints();
+      constraints.setNullable(<span class="java&#45;quote">"<span class="java&#45;keyword">false</span>"</span>);
+      columnContent.add(constraints);
+      column.setContent(columnContent);
+      createTable.getColumn().add(column);<p class="paragraph"/>      changeSet.getChangeSetChildren().add(createTable);<p class="paragraph"/>      DatabaseChangeLog databaseChangeLog = <span class="java&#45;keyword">new</span> DatabaseChangeLog();
+      databaseChangeLog.getChangeSetOrIncludeOrIncludeAll().add(changeSet);<p class="paragraph"/>      <span class="java&#45;keyword">return</span> Collections.singletonList(databaseChangeLog);
+   &#125;
+&#125;</pre></div><p class="paragraph"/>This class is nearly identical except that it's written in Groovy:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> grails.plugin.databasemigration.jaxb<p class="paragraph"/><span class="java&#45;keyword">import</span> org.liquibase.xml.ns.dbchangelog.Column
+<span class="java&#45;keyword">import</span> org.liquibase.xml.ns.dbchangelog.Constraints
+<span class="java&#45;keyword">import</span> org.liquibase.xml.ns.dbchangelog.CreateTable
+<span class="java&#45;keyword">import</span> org.liquibase.xml.ns.dbchangelog.DatabaseChangeLog
+<span class="java&#45;keyword">import</span> org.liquibase.xml.ns.dbchangelog.DatabaseChangeLog.ChangeSet<p class="paragraph"/>class CreateDepartment2Table &#123;<p class="paragraph"/>   def generate() &#123;<p class="paragraph"/>      def changeSet = <span class="java&#45;keyword">new</span> DatabaseChangeLog.ChangeSet(id: 'department2', author: 'Bob')<p class="paragraph"/>      def createTable = <span class="java&#45;keyword">new</span> CreateTable(tableName: 'department2')
+      createTable.column &#60;&#60; <span class="java&#45;keyword">new</span> Column(name: 'id', type: '<span class="java&#45;object">int</span>', content: &#91;<span class="java&#45;keyword">new</span> Constraints(primaryKey: <span class="java&#45;keyword">true</span>, nullable: <span class="java&#45;keyword">false</span>)&#93;)
+      createTable.column &#60;&#60; <span class="java&#45;keyword">new</span> Column(name: 'name', type: 'varchar(50)')
+      createTable.column &#60;&#60; <span class="java&#45;keyword">new</span> Column(name: 'active', type: '<span class="java&#45;object">boolean</span>', defaultValueBoolean: <span class="java&#45;keyword">true</span>, content: &#91;<span class="java&#45;keyword">new</span> Constraints(nullable: <span class="java&#45;keyword">false</span>)&#93;)
+      changeSet.changeSetChildren &#60;&#60; createTable<p class="paragraph"/>      &#91;<span class="java&#45;keyword">new</span> DatabaseChangeLog(changeSetOrIncludeOrIncludeAll: &#91;changeSet&#93;)&#93;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>It uses a different change set id since they must be unique, and a slightly different table name so they can be run in the same test. It also doesn't implement the <code>JaxbChangelogGenerator</code> interface, although it's a good idea to do so to make sure the signature is correct. Obviously the code is dramatically more compact and in general classes should probably be written in Groovy to not be overly verbose.
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../guide/2%20Getting%20Started.html">&lt;&lt; <strong>2</strong><span>Getting Started</span></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-16219500-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</body>
+</html>
